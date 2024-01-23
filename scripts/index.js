@@ -8,20 +8,20 @@
 
 // @todo: Вывести карточки на страницу
 
-function addCard(element, deleteCard) {
-  const cardConteiner = document.querySelector("#card-template").content;
-  const card = cardConteiner.cloneNode(true);
+function createCard(element, deleteCard) {
+  const cardTemplate = document.querySelector("#card-template").content;
+  const card = cardTemplate.cloneNode(true);
 
   const cardImage = card.querySelector(".card__image");
-    cardImage.src = element.link;
-    cardImage.atl = element.name;
+  cardImage.src = element.link;
+  cardImage.atl = element.name;
 
   const cardTitle = card.querySelector(".card__title");
-    cardTitle.textContent = element.name;
+  cardTitle.textContent = element.name;
 
   const deleteButton = card.querySelector(".card__delete-button");
-    deleteButton.addEventListener("click", () => {
-      deleteCard(deleteButton);
+  deleteButton.addEventListener("click", () => {
+    deleteCard(deleteButton);
   });
 
   return card;
@@ -32,6 +32,6 @@ function deleteCard(deleteButton) {
 }
 
 initialCards.forEach((cardData) => {
-  const cardElement = addCard(cardData, deleteCard);
-    document.querySelector(".places__list").appendChild(cardElement);
+  const cardElement = createCard(cardData, deleteCard);
+  document.querySelector(".places__list").appendChild(cardElement);
 });
