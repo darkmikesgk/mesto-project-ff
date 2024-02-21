@@ -6,21 +6,22 @@ function openModal(elem) {
   elem.addEventListener("click", clickClosePopup);
 }
 
-function closeModal() {
-  const openedModal = document.querySelector(".popup_is-opened");
-  openedModal.classList.remove("popup_is-opened");
+function closeModal(elem) {
+  elem.classList.remove("popup_is-opened");
   document.removeEventListener("keydown", escClosePopup);
-  openedModal.removeEventListener("click", clickClosePopup);
+  elem.removeEventListener("click", clickClosePopup);
 }
 
 function escClosePopup(evt) {
   if (evt.key === "Escape") {
-    closeModal();
+    const openedModal = document.querySelector(".popup_is-opened");
+    closeModal(openedModal);
   }
 }
 
 function clickClosePopup(evt) {
   if (evt.target === evt.currentTarget) {
-    closeModal();
+    const openedModal = document.querySelector(".popup_is-opened");
+    closeModal(openedModal);
   }
 }
