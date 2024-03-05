@@ -2,6 +2,7 @@ import "../pages/index.css";
 import { createCard, deleteCard, likeCard } from "./card.js";
 import { initialCards } from "./cards.js";
 import { openModal, closeModal } from "./modal.js";
+import { enableValidation, clearValidation } from "./validation.js";
 
 const editPopup = document.querySelector(".popup_type_edit");
 const newCardPopup = document.querySelector(".popup_type_new-card");
@@ -25,6 +26,15 @@ const jobInput = formElement.querySelector(".popup__input_type_description");
 const cardFormElement = document.forms["new-place"];
 const placeNameInput = cardFormElement.elements["place-name"];
 const linkInput = cardFormElement.elements["link"];
+//конфигурация валидации
+const validationConfiguration = {
+  formSelector: ".popup__form",
+  inputSelector: ".popup__input",
+  submitButtonSelector: ".popup__button",
+  inactiveButtonClass: "popup__button_disabled",
+  inputErrorClass: "popup__input_type_error",
+  errorClass: "popup__error_visible",
+};
 
 nameInput.value = titleProfileValue.textContent;
 jobInput.value = descriptionProfileValue.textContent;
@@ -82,9 +92,13 @@ initialCards.forEach((cardData) => {
 
 buttonOpenPopupProfile.addEventListener("click", () => {
   openModal(editPopup);
+  enableValidation(editPopup, validationConfiguration);
+  clearValidation(editPopup, validationConfiguration);
 });
 buttonAddPopupNewCard.addEventListener("click", () => {
   openModal(newCardPopup);
+  enableValidation(newCardPopup, validationConfiguration);
+  clearValidation(newCardPopup, validationConfiguration);
 });
 buttonClosePopupProfile.addEventListener("click", () => {
   closeModal(editPopup);
