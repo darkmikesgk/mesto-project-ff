@@ -17,6 +17,7 @@ const popupCaption = document.querySelector(".popup__caption");
 const placesList = document.querySelector(".places__list");
 const titleProfileValue = document.querySelector(".profile__title");
 const descriptionProfileValue = document.querySelector(".profile__description");
+const profileImage = document.querySelector(".profile__image");
 const popup = document.querySelectorAll(".popup");
 //форма профиля
 const formElement = document.forms["edit-profile"];
@@ -36,14 +37,25 @@ const validationConfiguration = {
   errorClass: "popup__error_visible",
 };
 
-nameInput.value = titleProfileValue.textContent;
-jobInput.value = descriptionProfileValue.textContent;
+// nameInput.value = titleProfileValue.textContent;
+// jobInput.value = descriptionProfileValue.textContent;
 
 function submitHandleFormProfile(evt) {
   evt.preventDefault();
 
-  titleProfileValue.textContent = nameInput.value;
-  descriptionProfileValue.textContent = jobInput.value;
+  updateProfile(nameInput.value, jobInput.value)
+    .then((result) => {
+      console.log(result);
+      titleProfileValue.textContent = result.name;
+      descriptionProfileValue.textContent = result.about;
+      nameInput.value = titleProfileValue.textContent;
+      jobInput.value = descriptionProfileValue.textContent;
+    })
+    .catch((err) => {
+      console.log(`Ошибка. Запрос не выполнен: ${err}`);
+    });
+  // titleProfileValue.textContent = nameInput.value;
+  // descriptionProfileValue.textContent = jobInput.value;
   closeModal(editPopup);
   formElement.reset();
 }
@@ -114,3 +126,73 @@ buttonClosePopupImage.addEventListener("click", () => {
 cardFormElement.addEventListener("submit", submitHandleFormNewCard);
 formElement.addEventListener("submit", submitHandleFormProfile);
 smoothTransition();
+
+const getProfile = () => {
+  return fetch("https://mesto.nomoreparties.co/v1/wff-cohort-8/users/me", {
+    headers: {
+      authorization: "dd6cce3f-a27e-4c09-af7d-93c6a1fea6ca",
+    },
+  })
+    .then((result) => {
+      if (result.ok) {
+        return result.json();
+      }
+      return Promise.reject(`Что-то пошло не так: ${result.status}`);
+    })
+    .then((result) => {
+      console.log(result);
+      titleProfileValue.textContent = result.name;
+      descriptionProfileValue.textContent = result.about;
+      nameInput.value = titleProfileValue.textContent;
+      jobInput.value = descriptionProfileValue.textContent;
+      profileImage.style.backgroundImage = `url(${result.avatar})`;
+    })
+    .catch((err) => {
+      console.log(`Ошибка: ${err}`);
+    });
+};
+
+const getCardList = () => {
+  return fetch("https://mesto.nomoreparties.co/v1/wff-cohort-8/cards", {
+    headers: {
+      authorization: "dd6cce3f-a27e-4c09-af7d-93c6a1fea6ca",
+    },
+  })
+    .then((result) => {
+      if (result.ok) {
+        return result.json();
+      }
+      return Promise.reject(`Что-то пошло не так: ${result.status}`);
+    })
+    .then((result) => {
+      console.log(result);
+    })
+    .catch((err) => {
+      console.log(`Ошибка. Запрос не выполнен: ${err}`);
+    });
+};
+
+const getData = () => {
+  return Promise.all([getProfile(), getCardList()]);
+};
+
+getData();
+
+const updateProfile = (name, about) => {
+  return fetch("https://mesto.nomoreparties.co/v1/wff-cohort-8/users/me", {
+    method: "PATCH",
+    headers: {
+      authorization: "dd6cce3f-a27e-4c09-af7d-93c6a1fea6ca",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      name: name,
+      about: about,
+    }),
+  }).then((result) => {
+    if (result.ok) {
+      return result.json();
+    }
+    return Promise.reject(`Что-то пошло не так: ${result.status}`);
+  });
+};
