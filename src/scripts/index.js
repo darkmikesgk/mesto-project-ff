@@ -19,6 +19,7 @@ const titleProfileValue = document.querySelector(".profile__title");
 const descriptionProfileValue = document.querySelector(".profile__description");
 const profileImage = document.querySelector(".profile__image");
 const popup = document.querySelectorAll(".popup");
+let userId;
 //форма профиля
 const formElement = document.forms["edit-profile"];
 const nameInput = formElement.querySelector(".popup__input_type_name");
@@ -37,9 +38,6 @@ const validationConfiguration = {
   errorClass: "popup__error_visible",
 };
 
-// nameInput.value = titleProfileValue.textContent;
-// jobInput.value = descriptionProfileValue.textContent;
-
 function submitHandleFormProfile(evt) {
   evt.preventDefault();
 
@@ -54,8 +52,6 @@ function submitHandleFormProfile(evt) {
     .catch((err) => {
       console.log(`Ошибка. Запрос не выполнен: ${err}`);
     });
-  // titleProfileValue.textContent = nameInput.value;
-  // descriptionProfileValue.textContent = jobInput.value;
   closeModal(editPopup);
   formElement.reset();
 }
@@ -63,25 +59,13 @@ function submitHandleFormProfile(evt) {
 function submitHandleFormNewCard(evt) {
   evt.preventDefault();
 
-  const newCard = {
-    name: placeNameInput.value,
-    link: linkInput.value,
-    alt: placeNameInput.value,
-  };
-
-  addCard(newCard);
+  addNewCard(placeNameInput.value, linkInput.value).then((data) => {
+    placesList.prepend(
+      createCard(data, userId, likeCard, deleteCard, removeCard, openCardImage)
+    );
+  });
   closeModal(newCardPopup);
   cardFormElement.reset();
-}
-
-function addCard(elem) {
-  const cardElement = createCard(elem, likeCard, deleteCard, openCardImage);
-
-  if (placesList.children.length < initialCards.length) {
-    placesList.append(cardElement);
-  } else {
-    placesList.prepend(cardElement);
-  }
 }
 
 function openCardImage(link, name) {
@@ -97,10 +81,6 @@ function smoothTransition() {
     item.classList.add("popup_is-animated");
   });
 }
-
-initialCards.forEach((cardData) => {
-  addCard(cardData);
-});
 
 buttonOpenPopupProfile.addEventListener("click", () => {
   openModal(editPopup);
@@ -139,14 +119,6 @@ const getProfile = () => {
       }
       return Promise.reject(`Что-то пошло не так: ${result.status}`);
     })
-    .then((result) => {
-      console.log(result);
-      titleProfileValue.textContent = result.name;
-      descriptionProfileValue.textContent = result.about;
-      nameInput.value = titleProfileValue.textContent;
-      jobInput.value = descriptionProfileValue.textContent;
-      profileImage.style.backgroundImage = `url(${result.avatar})`;
-    })
     .catch((err) => {
       console.log(`Ошибка: ${err}`);
     });
@@ -164,16 +136,35 @@ const getCardList = () => {
       }
       return Promise.reject(`Что-то пошло не так: ${result.status}`);
     })
-    .then((result) => {
-      console.log(result);
-    })
     .catch((err) => {
       console.log(`Ошибка. Запрос не выполнен: ${err}`);
     });
 };
 
 const getData = () => {
-  return Promise.all([getProfile(), getCardList()]);
+  return Promise.all([getProfile(), getCardList()]).then((result) => {
+    titleProfileValue.textContent = result[0].name;
+    descriptionProfileValue.textContent = result[0].about;
+    nameInput.value = titleProfileValue.textContent;
+    jobInput.value = descriptionProfileValue.textContent;
+    profileImage.style.backgroundImage = `url(${result[0].avatar})`;
+    userId = result[0]._id;
+    //console.log(result[0]);
+    console.log(result[1]);
+    console.log(userId);
+    // for (let i = 0; i < 30; i++) {
+    //   let ownerId = result[1][i].owner._id;
+    //   //console.log(ownerId);
+    //   if (userId === ownerId) {
+    //     console.log("1")
+    //   }
+    // }
+    result[1].forEach((card) => {
+      placesList.append(
+        createCard(card, userId, likeCard, deleteCard, removeCard, openCardImage)
+      );
+    });
+  });
 };
 
 getData();
@@ -195,4 +186,41 @@ const updateProfile = (name, about) => {
     }
     return Promise.reject(`Что-то пошло не так: ${result.status}`);
   });
+};
+
+const addNewCard = (name, link) => {
+  return fetch("https://mesto.nomoreparties.co/v1/wff-cohort-8/cards", {
+    method: "POST",
+    headers: {
+      authorization: "dd6cce3f-a27e-4c09-af7d-93c6a1fea6ca",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      name: name,
+      link: link,
+    }),
+  }).then((result) => {
+    if (result.ok) {
+      return result.json();
+    }
+    return Promise.reject(`Что-то пошло не так: ${result.status}`);
+  });
+};
+
+export const removeCard = (data) => {
+  return fetch(
+    `https://mesto.nomoreparties.co/v1/wff-cohort-8/cards/${data}`,
+    {
+      method: "DELETE",
+      headers: {
+        authorization: "dd6cce3f-a27e-4c09-af7d-93c6a1fea6ca",
+      },
+    }
+  ).then((res) => {
+    if (res.ok) {
+      return res.json();
+    } else {
+      return Promise.reject(`Error: ${res.status}`);
+    }
+  })
 };

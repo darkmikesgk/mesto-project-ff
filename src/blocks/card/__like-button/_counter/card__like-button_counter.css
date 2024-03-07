@@ -1,0 +1,9 @@
+.card__like-button_counter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  inline-size: 22px;
+  block-size: 35px;
+  gap: 8px;
+}
