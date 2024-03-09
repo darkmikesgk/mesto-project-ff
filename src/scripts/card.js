@@ -1,7 +1,15 @@
 export { createCard, deleteCard, likeCard };
 
-
-function createCard(element, userId, likeCard, deleteCard, removeCard, openCardImage) {
+function createCard(
+  element,
+  userId,
+  likeCard,
+  deleteCard,
+  removeCard,
+  openCardImage,
+  likeCardCountPlus,
+  likeCardCountMinus,
+) {
   const cardTemplate = document.querySelector("#card-template").content;
   const card = cardTemplate.querySelector(".places__item").cloneNode(true);
   const cardImage = card.querySelector(".card__image");
@@ -9,7 +17,6 @@ function createCard(element, userId, likeCard, deleteCard, removeCard, openCardI
   const likeCounter = card.querySelector(".card__like-button_counter-style");
   const likeButton = card.querySelector(".card__like-button");
   const deleteButton = card.querySelector(".card__delete-button");
-
   cardImage.src = element.link;
   cardImage.atl = element.name;
   cardTitle.textContent = element.name;
@@ -19,8 +26,15 @@ function createCard(element, userId, likeCard, deleteCard, removeCard, openCardI
     openCardImage(element.link, element.name);
   });
 
+  checkLikeIsActive(userId, element, likeButton);
+
   likeButton.addEventListener("click", () => {
-    likeCard(likeButton);
+    likeCard(element, likeButton, likeCounter);
+    if (parseInt(likeCounter.textContent) > element.likes.length) {
+      likeCardCountPlus(element._id);
+    } else if (parseInt(likeCounter.textContent) <= element.likes.length) {
+      likeCardCountMinus(element._id);
+    }
   });
 
   if (userId === element.owner._id) {
@@ -29,19 +43,31 @@ function createCard(element, userId, likeCard, deleteCard, removeCard, openCardI
       removeCard(element._id);
     });
   } else {
-      deleteButton.remove();
+    deleteButton.remove();
   }
   return card;
 }
 
 function deleteCard(deleteButton) {
-    deleteButton.remove();
-  }
+  deleteButton.remove();
+}
 
-function likeCard(elem) {
+function likeCard(data, elem, like) {
   if (!elem.classList.contains("card__like-button_is-active")) {
     elem.classList.add("card__like-button_is-active");
+    if (parseInt(like.textContent) <= data.likes.length) {
+      like.textContent++;
+    }
   } else {
     elem.classList.remove("card__like-button_is-active");
+    if (parseInt(like.textContent) > 0) {
+      like.textContent--;
+    }
+  }
+}
+
+function checkLikeIsActive(userId, elem, button) {
+  if (elem.likes.some((like) => like._id === userId)) {
+    button.classList.add("card__like-button_is-active");
   }
 }

@@ -1,6 +1,5 @@
 import "../pages/index.css";
 import { createCard, deleteCard, likeCard } from "./card.js";
-import { initialCards } from "./cards.js";
 import { openModal, closeModal } from "./modal.js";
 import { enableValidation, clearValidation } from "./validation.js";
 
@@ -61,7 +60,7 @@ function submitHandleFormNewCard(evt) {
 
   addNewCard(placeNameInput.value, linkInput.value).then((data) => {
     placesList.prepend(
-      createCard(data, userId, likeCard, deleteCard, removeCard, openCardImage)
+      createCard(data, userId, likeCard, deleteCard, removeCard, openCardImage, likeCardCountPlus, likeCardCountMinus)
     );
   });
   closeModal(newCardPopup);
@@ -151,7 +150,7 @@ const getData = () => {
     userId = result[0]._id;
     //console.log(result[0]);
     console.log(result[1]);
-    console.log(userId);
+    //console.log(userId);
     // for (let i = 0; i < 30; i++) {
     //   let ownerId = result[1][i].owner._id;
     //   //console.log(ownerId);
@@ -161,9 +160,12 @@ const getData = () => {
     // }
     result[1].forEach((card) => {
       placesList.append(
-        createCard(card, userId, likeCard, deleteCard, removeCard, openCardImage)
+        createCard(card, userId, likeCard, deleteCard, removeCard, openCardImage, likeCardCountPlus, likeCardCountMinus)
       );
     });
+    //console.log(result[1][0].likes[0]._id)
+    // console.log(result[1].some(obj =>
+    //   obj.likes.some(like => like._id === userId)))
   });
 };
 
@@ -207,7 +209,7 @@ const addNewCard = (name, link) => {
   });
 };
 
-export const removeCard = (data) => {
+const removeCard = (data) => {
   return fetch(
     `https://mesto.nomoreparties.co/v1/wff-cohort-8/cards/${data}`,
     {
@@ -222,5 +224,27 @@ export const removeCard = (data) => {
     } else {
       return Promise.reject(`Error: ${res.status}`);
     }
+  })
+};
+
+const likeCardCountPlus = (data) => {
+  return fetch(
+    `https://mesto.nomoreparties.co/v1/wff-cohort-8/cards/likes/${data}`,
+    {
+      method: "PUT",
+      headers: {
+        authorization: "dd6cce3f-a27e-4c09-af7d-93c6a1fea6ca",
+      },
+  })
+};
+
+const likeCardCountMinus = (data) => {
+  return fetch(
+    `https://mesto.nomoreparties.co/v1/wff-cohort-8/cards/likes/${data}`,
+    {
+      method: "DELETE",
+      headers: {
+        authorization: "dd6cce3f-a27e-4c09-af7d-93c6a1fea6ca",
+      },
   })
 };
