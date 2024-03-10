@@ -8,7 +8,7 @@ function createCard(
   removeCard,
   openCardImage,
   likeCardCountPlus,
-  likeCardCountMinus,
+  likeCardCountMinus
 ) {
   const cardTemplate = document.querySelector("#card-template").content;
   const card = cardTemplate.querySelector(".places__item").cloneNode(true);

@@ -2,6 +2,16 @@ import "../pages/index.css";
 import { createCard, deleteCard, likeCard } from "./card.js";
 import { openModal, closeModal } from "./modal.js";
 import { enableValidation, clearValidation } from "./validation.js";
+import {
+  getProfile,
+  getCardList,
+  updateProfile,
+  addNewCard,
+  removeCard,
+  likeCardCountPlus,
+  likeCardCountMinus,
+  updateAvatar,
+} from "./api.js";
 
 const editPopup = document.querySelector(".popup_type_edit");
 const newCardPopup = document.querySelector(".popup_type_new-card");
@@ -13,7 +23,13 @@ const buttonClosePopupProfile = editPopup.querySelector(".popup__close");
 const buttonClosePopupNewCard = newCardPopup.querySelector(".popup__close");
 const buttonClosePopupImage = imagePopup.querySelector(".popup__close");
 const buttonClosePopupAvatar = avatarPopup.querySelector(".popup__close");
-const buttonSaveChanges = document.querySelector(".button");
+const buttonSubmitChangesProfile = document.querySelector(
+  ".popup__button_save-profile"
+);
+const buttonSubmitAddCard = document.querySelector(".popup__button_add-card");
+const buttonSubmitChangesAvatar = document.querySelector(
+  ".popup__button_change-avatar"
+);
 const popupImage = document.querySelector(".popup__image");
 const popupCaption = document.querySelector(".popup__caption");
 const placesList = document.querySelector(".places__list");
@@ -33,7 +49,6 @@ const linkInput = cardFormElement.elements["link"];
 //форма изменения аватара
 const avatarFormElement = document.forms["change-avatar"];
 const avatarUrlInput = avatarFormElement.elements["link-avatar"];
-
 //конфигурация валидации
 const validationConfiguration = {
   formSelector: ".popup__form",
@@ -44,9 +59,35 @@ const validationConfiguration = {
   errorClass: "popup__error_visible",
 };
 
+const getData = () => {
+  return Promise.all([getProfile(), getCardList()]).then((result) => {
+    titleProfileValue.textContent = result[0].name;
+    descriptionProfileValue.textContent = result[0].about;
+    nameInput.value = titleProfileValue.textContent;
+    jobInput.value = descriptionProfileValue.textContent;
+    profileImage.style.backgroundImage = `url(${result[0].avatar})`;
+    userId = result[0]._id;
+
+    result[1].forEach((card) => {
+      placesList.append(
+        createCard(
+          card,
+          userId,
+          likeCard,
+          deleteCard,
+          removeCard,
+          openCardImage,
+          likeCardCountPlus,
+          likeCardCountMinus
+        )
+      );
+    });
+  });
+};
+
 function submitHandleFormProfile(evt) {
   evt.preventDefault();
-  renderIsLoading(true);
+  renderLoading(true, buttonSubmitChangesProfile);
   updateProfile(nameInput.value, jobInput.value)
     .then((result) => {
       titleProfileValue.textContent = result.name;
@@ -58,7 +99,7 @@ function submitHandleFormProfile(evt) {
       console.log(`Ошибка. Запрос не выполнен: ${err}`);
     })
     .finally(() => {
-      renderIsLoading(false);
+      renderLoading(false, buttonSubmitChangesProfile);
     });
   closeModal(editPopup);
   formElement.reset();
@@ -66,7 +107,7 @@ function submitHandleFormProfile(evt) {
 
 function submitHandleAvatar(evt) {
   evt.preventDefault();
-  renderIsLoading(true);
+  renderLoading(true, buttonSubmitChangesAvatar);
   updateAvatar(avatarUrlInput.value)
     .then((res) => {
       avatarUrlInput.value = res.avatar;
@@ -76,30 +117,31 @@ function submitHandleAvatar(evt) {
       console.log(`Ошибка. Запрос не выполнен: ${err}`);
     })
     .finally(() => {
-      renderIsLoading(false);
+      renderLoading(false, buttonSubmitChangesAvatar);
     });
   closeModal(avatarPopup);
 }
 
 function submitHandleFormNewCard(evt) {
   evt.preventDefault();
-  renderIsLoading(true);
-  addNewCard(placeNameInput.value, linkInput.value).then((data) => {
-    placesList.prepend(
-      createCard(
-        data,
-        userId,
-        likeCard,
-        deleteCard,
-        removeCard,
-        openCardImage,
-        likeCardCountPlus,
-        likeCardCountMinus
-      )
-    );
-  })
+  renderLoading(true, buttonSubmitAddCard);
+  addNewCard(placeNameInput.value, linkInput.value)
+    .then((data) => {
+      placesList.prepend(
+        createCard(
+          data,
+          userId,
+          likeCard,
+          deleteCard,
+          removeCard,
+          openCardImage,
+          likeCardCountPlus,
+          likeCardCountMinus
+        )
+      );
+    })
     .finally(() => {
-      renderIsLoading(false);
+      renderLoading(false, buttonSubmitAddCard);
     });
   closeModal(newCardPopup);
   cardFormElement.reset();
@@ -119,208 +161,51 @@ function smoothTransition() {
   });
 }
 
+function renderLoading(isLoading, buttonElement) {
+  if (isLoading) {
+    buttonElement.textContent = "Сохранение...";
+  } else {
+    buttonElement.textContent = "Сохранить";
+  }
+}
+
+getData();
 buttonOpenPopupProfile.addEventListener("click", () => {
   openModal(editPopup);
   enableValidation(editPopup, validationConfiguration);
   clearValidation(editPopup, validationConfiguration);
 });
+
 buttonAddPopupNewCard.addEventListener("click", () => {
   openModal(newCardPopup);
   enableValidation(newCardPopup, validationConfiguration);
   clearValidation(newCardPopup, validationConfiguration);
 });
+
 profileImage.addEventListener("click", () => {
   openModal(avatarPopup);
   enableValidation(avatarPopup, validationConfiguration);
   clearValidation(avatarPopup, validationConfiguration);
 });
+
 buttonClosePopupProfile.addEventListener("click", () => {
   closeModal(editPopup);
   formElement.reset();
 });
+
 buttonClosePopupNewCard.addEventListener("click", () => {
   closeModal(newCardPopup);
 });
+
 buttonClosePopupImage.addEventListener("click", () => {
   closeModal(imagePopup);
 });
+
 buttonClosePopupAvatar.addEventListener("click", () => {
   closeModal(avatarPopup);
 });
 
-cardFormElement.addEventListener("submit",submitHandleFormNewCard)
+cardFormElement.addEventListener("submit", submitHandleFormNewCard);
 formElement.addEventListener("submit", submitHandleFormProfile);
-avatarFormElement.addEventListener("submit", submitHandleAvatar)
+avatarFormElement.addEventListener("submit", submitHandleAvatar);
 smoothTransition();
-
-const getProfile = () => {
-  return fetch("https://mesto.nomoreparties.co/v1/wff-cohort-8/users/me", {
-    headers: {
-      authorization: "dd6cce3f-a27e-4c09-af7d-93c6a1fea6ca",
-    },
-  })
-    .then((result) => {
-      if (result.ok) {
-        return result.json();
-      }
-      return Promise.reject(`Что-то пошло не так: ${result.status}`);
-    })
-    .catch((err) => {
-      console.log(`Ошибка: ${err}`);
-    });
-};
-
-const getCardList = () => {
-  return fetch("https://mesto.nomoreparties.co/v1/wff-cohort-8/cards", {
-    headers: {
-      authorization: "dd6cce3f-a27e-4c09-af7d-93c6a1fea6ca",
-    },
-  })
-    .then((result) => {
-      if (result.ok) {
-        return result.json();
-      }
-      return Promise.reject(`Что-то пошло не так: ${result.status}`);
-    })
-    .catch((err) => {
-      console.log(`Ошибка. Запрос не выполнен: ${err}`);
-    });
-};
-
-const getData = () => {
-  return Promise.all([getProfile(), getCardList()]).then((result) => {
-    titleProfileValue.textContent = result[0].name;
-    descriptionProfileValue.textContent = result[0].about;
-    nameInput.value = titleProfileValue.textContent;
-    jobInput.value = descriptionProfileValue.textContent;
-    profileImage.style.backgroundImage = `url(${result[0].avatar})`;
-    userId = result[0]._id;
-    console.log(result[0].avatar);
-    //console.log(result[0]);
-    console.log(result[1]);
-    //console.log(userId);
-
-    result[1].forEach((card) => {
-      placesList.append(
-        createCard(
-          card,
-          userId,
-          likeCard,
-          deleteCard,
-          removeCard,
-          openCardImage,
-          likeCardCountPlus,
-          likeCardCountMinus
-        )
-      );
-    });
-  });
-};
-
-getData();
-
-const updateProfile = (name, about) => {
-  return fetch("https://mesto.nomoreparties.co/v1/wff-cohort-8/users/me", {
-    method: "PATCH",
-    headers: {
-      authorization: "dd6cce3f-a27e-4c09-af7d-93c6a1fea6ca",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      name: name,
-      about: about,
-    }),
-  }).then((result) => {
-    if (result.ok) {
-      return result.json();
-    }
-    return Promise.reject(`Что-то пошло не так: ${result.status}`);
-  });
-};
-
-const addNewCard = (name, link) => {
-  return fetch("https://mesto.nomoreparties.co/v1/wff-cohort-8/cards", {
-    method: "POST",
-    headers: {
-      authorization: "dd6cce3f-a27e-4c09-af7d-93c6a1fea6ca",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      name: name,
-      link: link,
-    }),
-  }).then((result) => {
-    if (result.ok) {
-      return result.json();
-    }
-    return Promise.reject(`Что-то пошло не так: ${result.status}`);
-  });
-};
-
-const removeCard = (data) => {
-  return fetch(`https://mesto.nomoreparties.co/v1/wff-cohort-8/cards/${data}`, {
-    method: "DELETE",
-    headers: {
-      authorization: "dd6cce3f-a27e-4c09-af7d-93c6a1fea6ca",
-    },
-  }).then((res) => {
-    if (res.ok) {
-      return res.json();
-    } else {
-      return Promise.reject(`Error: ${res.status}`);
-    }
-  });
-};
-
-const likeCardCountPlus = (data) => {
-  return fetch(
-    `https://mesto.nomoreparties.co/v1/wff-cohort-8/cards/likes/${data}`,
-    {
-      method: "PUT",
-      headers: {
-        authorization: "dd6cce3f-a27e-4c09-af7d-93c6a1fea6ca",
-      },
-    }
-  );
-};
-
-const likeCardCountMinus = (data) => {
-  return fetch(
-    `https://mesto.nomoreparties.co/v1/wff-cohort-8/cards/likes/${data}`,
-    {
-      method: "DELETE",
-      headers: {
-        authorization: "dd6cce3f-a27e-4c09-af7d-93c6a1fea6ca",
-      },
-    }
-  );
-};
-
-const updateAvatar = (avatar) => {
-  return fetch(
-    "https://mesto.nomoreparties.co/v1/wff-cohort-8/users/me/avatar",
-    {
-      method: "PATCH",
-      headers: {
-        authorization: "dd6cce3f-a27e-4c09-af7d-93c6a1fea6ca",
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        avatar: avatar,
-      }),
-    }
-  ).then((result) => {
-    if (result.ok) {
-      return result.json();
-    }
-    return Promise.reject(`Что-то пошло не так: ${result.status}`);
-  });
-};
-
-function renderIsLoading(isLoading) {
-  if (isLoading) {
-    buttonSaveChanges.textContent = "Сохранение..."
-  } else {
-    buttonSaveChanges.textContent = "Сохранить"
-  }
-}
