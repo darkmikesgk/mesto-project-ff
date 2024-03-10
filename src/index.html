@@ -20,10 +20,7 @@
       </header>
       <main class="content">
         <section class="profile page__section">
-          <div
-            class="profile__image"
-            style="background-image: url(<%=require('./images/avatar.jpg')%>)"
-          ></div>
+          <div class="profile__image"></div>
           <div class="profile__info">
             <h1 class="profile__title"></h1>
             <button
@@ -121,6 +118,30 @@
           <p class="popup__caption"></p>
         </div>
       </div>
+
+      <div class="popup popup_type_avatar">
+        <div class="popup__content popup__content_avatar">
+          <button type="button" class="popup__close"></button>
+          <h3 class="popup__title">Обновить аватар</h3>
+          <form class="popup__form" name="change-avatar">
+            <input
+              id="popup__input_type_url-avatar"
+              type="url"
+              name="link-avatar"
+              class="popup__input popup__input_type_url"
+              placeholder="Ссылка на картинку"
+              pattern="^(http(s)?:)?\/\/([a-z0-9_.-]+\.)+[a-z]{2,6}$"
+              data-error-message=""
+              required
+            />
+            <span class="popup__input-error popup__input_type_url-avatar-error"></span> 
+            <button type="submit" class="button popup__button">
+              Сохранить
+            </button>
+          </form>
+        </div>
+      </div>
+
     </div>
 
     <template id="card-template">
