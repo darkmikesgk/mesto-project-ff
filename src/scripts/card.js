@@ -1,3 +1,4 @@
+import { openModal } from "./modal";
 export { createCard, deleteCard, likeCard };
 
 function createCard(
@@ -6,6 +7,7 @@ function createCard(
   likeCard,
   deleteCard,
   removeCard,
+  openConfirmPopup,
   openCardImage,
   likeCardCountPlus,
   likeCardCountMinus
@@ -21,6 +23,7 @@ function createCard(
   cardImage.atl = element.name;
   cardTitle.textContent = element.name;
   likeCounter.textContent = element.likes.length;
+  const deleteCardPopup = document.querySelector(".popup_type_delete_card");
 
   cardImage.addEventListener("click", () => {
     openCardImage(element.link, element.name);
@@ -39,8 +42,9 @@ function createCard(
 
   if (userId === element.owner._id) {
     deleteButton.addEventListener("click", () => {
-      deleteCard(card);
-      removeCard(element._id);
+      openModal(deleteCardPopup);
+      console.log(element._id);
+      openConfirmPopup(element._id, card);
     });
   } else {
     deleteButton.remove();

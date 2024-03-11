@@ -17,6 +17,8 @@
 @import url('./__input/_type/popup__input_type_card-name-error.css');
 @import url('./__input/_type/popup__input_type_url-avatar-error.css');
 @import url('./__content/popup__content_avatar.css');
+@import url('./__content/popup__content_delete_card.css');
+@import url('./__button/popup__button_delete-card.css');
 
 .popup {
   position: fixed;

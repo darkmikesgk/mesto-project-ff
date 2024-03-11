@@ -1,3 +1,5 @@
+import { deleteCard } from "./card";
+
 const config = {
   baseUrl: "https://mesto.nomoreparties.co/v1/wff-cohort-8/",
   headers: {
@@ -11,14 +13,11 @@ export const getProfile = () => {
       authorization: config.headers.token,
     },
   })
-    .then((result) => {
-      if (result.ok) {
-        return result.json();
-      }
-      return Promise.reject(`Что-то пошло не так: ${result.status}`);
+    .then((res) => {
+      return getResponseData(res);
     })
     .catch((err) => {
-      console.log(`Ошибка: ${err}`);
+      getResponseError(err);
     });
 };
 
@@ -28,14 +27,11 @@ export const getCardList = () => {
       authorization: config.headers.token,
     },
   })
-    .then((result) => {
-      if (result.ok) {
-        return result.json();
-      }
-      return Promise.reject(`Что-то пошло не так: ${result.status}`);
+    .then((res) => {
+      return getResponseData(res);
     })
     .catch((err) => {
-      console.log(`Ошибка. Запрос не выполнен: ${err}`);
+      getResponseError(err);
     });
 };
 
@@ -50,12 +46,13 @@ export const updateProfile = (name, about) => {
       name: name,
       about: about,
     }),
-  }).then((result) => {
-    if (result.ok) {
-      return result.json();
-    }
-    return Promise.reject(`Что-то пошло не так: ${result.status}`);
-  });
+  })
+    .then((res) => {
+      return getResponseData(res);
+    })
+    .catch((err) => {
+      getResponseError(err);
+    });
 };
 
 export const addNewCard = (name, link) => {
@@ -70,14 +67,11 @@ export const addNewCard = (name, link) => {
       link: link,
     }),
   })
-    .then((result) => {
-      if (result.ok) {
-        return result.json();
-      }
-      return Promise.reject(`Что-то пошло не так: ${result.status}`);
+    .then((res) => {
+      return getResponseData(res);
     })
     .catch((err) => {
-      console.log(`Ошибка. Запрос не выполнен: ${err}`);
+      getResponseError(err);
     });
 };
 
@@ -88,14 +82,11 @@ export const removeCard = (data) => {
       authorization: config.headers.token,
     },
   })
-    .then((result) => {
-      if (result.ok) {
-        return result.json();
-      }
-      return Promise.reject(`Что-то пошло не так: ${result.status}`);
+    .then((res) => {
+      return getResponseData(res);
     })
     .catch((err) => {
-      console.log(`Ошибка. Запрос не выполнен: ${err}`);
+      getResponseError(err);
     });
 };
 
@@ -106,14 +97,11 @@ export const likeCardCountPlus = (data) => {
       authorization: config.headers.token,
     },
   })
-    .then((result) => {
-      if (result.ok) {
-        return result.json();
-      }
-      return Promise.reject(`Что-то пошло не так: ${result.status}`);
+    .then((res) => {
+      return getResponseData(res);
     })
     .catch((err) => {
-      console.log(`Ошибка. Запрос не выполнен: ${err}`);
+      getResponseError(err);
     });
 };
 
@@ -124,14 +112,11 @@ export const likeCardCountMinus = (data) => {
       authorization: config.headers.token,
     },
   })
-    .then((result) => {
-      if (result.ok) {
-        return result.json();
-      }
-      return Promise.reject(`Что-то пошло не так: ${result.status}`);
+    .then((res) => {
+      return getResponseData(res);
     })
     .catch((err) => {
-      console.log(`Ошибка. Запрос не выполнен: ${err}`);
+      getResponseError(err);
     });
 };
 
@@ -146,13 +131,21 @@ export const updateAvatar = (avatar) => {
       avatar: avatar,
     }),
   })
-    .then((result) => {
-      if (result.ok) {
-        return result.json();
-      }
-      return Promise.reject(`Что-то пошло не так: ${result.status}`);
+    .then((res) => {
+      return getResponseData(res);
     })
     .catch((err) => {
-      console.log(`Ошибка. Запрос не выполнен: ${err}`);
+      getResponseError(err);
     });
 };
+
+function getResponseData(res) {
+  if (res.ok) {
+    return res.json();
+  }
+  return Promise.reject(`Что-то пошло не так: ${res.status}`);
+}
+
+function getResponseError(err) {
+  console.log(`Ошибка. Запрос не выполнен: ${err}`);
+}

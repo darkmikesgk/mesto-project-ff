@@ -17,12 +17,15 @@ const editPopup = document.querySelector(".popup_type_edit");
 const newCardPopup = document.querySelector(".popup_type_new-card");
 const imagePopup = document.querySelector(".popup_type_image");
 const avatarPopup = document.querySelector(".popup_type_avatar");
+const deleteCardPopup = document.querySelector(".popup_type_delete_card");
 const buttonOpenPopupProfile = document.querySelector(".profile__edit-button");
 const buttonAddPopupNewCard = document.querySelector(".profile__add-button");
 const buttonClosePopupProfile = editPopup.querySelector(".popup__close");
 const buttonClosePopupNewCard = newCardPopup.querySelector(".popup__close");
 const buttonClosePopupImage = imagePopup.querySelector(".popup__close");
 const buttonClosePopupAvatar = avatarPopup.querySelector(".popup__close");
+const buttonClosePopupDeleteCard =
+  deleteCardPopup.querySelector(".popup__close");
 const buttonSubmitChangesProfile = document.querySelector(
   ".popup__button_save-profile"
 );
@@ -76,6 +79,7 @@ const getData = () => {
           likeCard,
           deleteCard,
           removeCard,
+          openConfirmPopup,
           openCardImage,
           likeCardCountPlus,
           likeCardCountMinus
@@ -134,6 +138,7 @@ function submitHandleFormNewCard(evt) {
           likeCard,
           deleteCard,
           removeCard,
+          openConfirmPopup,
           openCardImage,
           likeCardCountPlus,
           likeCardCountMinus
@@ -145,6 +150,27 @@ function submitHandleFormNewCard(evt) {
     });
   closeModal(newCardPopup);
   cardFormElement.reset();
+}
+
+function openConfirmPopup(cardId, card) {
+  const deleteFormElement = document.forms["delete-card"];
+  if (deleteFormElement.handleSubmitConfirmPopup) {
+    deleteFormElement.removeEventListener(
+      "submit",
+      deleteFormElement.handleSubmitConfirmPopup
+    );
+  }
+
+  deleteFormElement.handleSubmitConfirmPopup = (evt) => {
+    evt.preventDefault();
+    removeCard(cardId);
+    deleteCard(card);
+    closeModal(deleteCardPopup);
+  };
+  deleteFormElement.addEventListener(
+    "submit",
+    deleteFormElement.handleSubmitConfirmPopup
+  );
 }
 
 function openCardImage(link, name) {
@@ -203,6 +229,10 @@ buttonClosePopupImage.addEventListener("click", () => {
 
 buttonClosePopupAvatar.addEventListener("click", () => {
   closeModal(avatarPopup);
+});
+
+buttonClosePopupDeleteCard.addEventListener("click", () => {
+  closeModal(deleteCardPopup);
 });
 
 cardFormElement.addEventListener("submit", submitHandleFormNewCard);
