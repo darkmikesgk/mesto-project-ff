@@ -153,6 +153,7 @@ function submitHandleFormNewCard(evt) {
 }
 
 function openConfirmPopup(cardId, card) {
+  openModal(deleteCardPopup);
   const deleteFormElement = document.forms["delete-card"];
   if (deleteFormElement.handleSubmitConfirmPopup) {
     deleteFormElement.removeEventListener(
@@ -195,7 +196,6 @@ function renderLoading(isLoading, buttonElement) {
   }
 }
 
-getData();
 buttonOpenPopupProfile.addEventListener("click", () => {
   openModal(editPopup);
   enableValidation(editPopup, validationConfiguration);
@@ -235,6 +235,7 @@ buttonClosePopupDeleteCard.addEventListener("click", () => {
   closeModal(deleteCardPopup);
 });
 
+getData();
 cardFormElement.addEventListener("submit", submitHandleFormNewCard);
 formElement.addEventListener("submit", submitHandleFormProfile);
 avatarFormElement.addEventListener("submit", submitHandleAvatar);

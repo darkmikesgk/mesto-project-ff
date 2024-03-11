@@ -1,4 +1,3 @@
-import { openModal } from "./modal";
 export { createCard, deleteCard, likeCard };
 
 function createCard(
@@ -23,7 +22,6 @@ function createCard(
   cardImage.atl = element.name;
   cardTitle.textContent = element.name;
   likeCounter.textContent = element.likes.length;
-  const deleteCardPopup = document.querySelector(".popup_type_delete_card");
 
   cardImage.addEventListener("click", () => {
     openCardImage(element.link, element.name);
@@ -42,7 +40,6 @@ function createCard(
 
   if (userId === element.owner._id) {
     deleteButton.addEventListener("click", () => {
-      openModal(deleteCardPopup);
       console.log(element._id);
       openConfirmPopup(element._id, card);
     });
