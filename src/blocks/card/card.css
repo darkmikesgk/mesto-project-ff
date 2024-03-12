@@ -6,12 +6,13 @@
 @import url('./__title/card__title.css');
 @import url('./__like-button/_counter/card__like-button_counter.css');
 @import url('./__like-button/_counter/card__like-button_counter-style.css');
+@import url('./__like-button/_counter/card__like-button_counter-visible.css');
 
 .card {
-  font-family: 'Inter', Arial, sans-serif;
+  position: relative;
   -webkit-border-radius: 10px;
   -moz-border-radius: 10px;
   border-radius: 10px;
-  position: relative;
   overflow: hidden;
+  font-family: 'Inter', Arial, sans-serif;
 }

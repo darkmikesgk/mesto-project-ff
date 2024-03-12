@@ -19,6 +19,7 @@
 @import url('./__content/popup__content_avatar.css');
 @import url('./__content/popup__content_delete_card.css');
 @import url('./__button/popup__button_delete-card.css');
+@import url('./__dark/popup__dark.css');
 
 .popup {
   position: fixed;
@@ -33,3 +34,4 @@
   font-family: 'Inter', Arial, sans-serif;
   background-color: rgba(0, 0, 0, .5);
 }
+

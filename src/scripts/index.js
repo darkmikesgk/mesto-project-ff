@@ -106,7 +106,6 @@ function submitHandleFormProfile(evt) {
       renderLoading(false, buttonSubmitChangesProfile);
     });
   closeModal(editPopup);
-  formElement.reset();
 }
 
 function submitHandleAvatar(evt) {
@@ -178,7 +177,7 @@ function openCardImage(link, name) {
   popupImage.src = link;
   popupImage.alt = name;
   popupCaption.textContent = name;
-  imagePopup.style.backgroundColor = "black";
+  imagePopup.classList.add("popup__dark");
   openModal(imagePopup);
 }
 
@@ -200,6 +199,13 @@ buttonOpenPopupProfile.addEventListener("click", () => {
   openModal(editPopup);
   enableValidation(editPopup, validationConfiguration);
   clearValidation(editPopup, validationConfiguration);
+  if (
+    nameInput.value === titleProfileValue.textContent &&
+    jobInput.value === descriptionProfileValue.textContent
+  ) {
+    buttonSubmitChangesProfile.setAttribute("disabled", true);
+    buttonSubmitChangesProfile.classList.add("popup__button_disabled");
+  }
 });
 
 buttonAddPopupNewCard.addEventListener("click", () => {
@@ -236,7 +242,8 @@ buttonClosePopupDeleteCard.addEventListener("click", () => {
 });
 
 getData();
+smoothTransition();
 cardFormElement.addEventListener("submit", submitHandleFormNewCard);
 formElement.addEventListener("submit", submitHandleFormProfile);
 avatarFormElement.addEventListener("submit", submitHandleAvatar);
-smoothTransition();
+

@@ -28,6 +28,7 @@ function createCard(
   });
 
   checkLikeIsActive(userId, element, likeButton);
+  amountOfLikesCheck(likeCounter);
 
   likeButton.addEventListener("click", () => {
     likeCard(element, likeButton, likeCounter);
@@ -40,7 +41,6 @@ function createCard(
 
   if (userId === element.owner._id) {
     deleteButton.addEventListener("click", () => {
-      console.log(element._id);
       openConfirmPopup(element._id, card);
     });
   } else {
@@ -58,11 +58,13 @@ function likeCard(data, elem, like) {
     elem.classList.add("card__like-button_is-active");
     if (parseInt(like.textContent) <= data.likes.length) {
       like.textContent++;
+      amountOfLikesCheck(like);
     }
   } else {
     elem.classList.remove("card__like-button_is-active");
     if (parseInt(like.textContent) > 0) {
       like.textContent--;
+      amountOfLikesCheck(like);
     }
   }
 }
@@ -70,5 +72,13 @@ function likeCard(data, elem, like) {
 function checkLikeIsActive(userId, elem, button) {
   if (elem.likes.some((like) => like._id === userId)) {
     button.classList.add("card__like-button_is-active");
+  }
+}
+
+function amountOfLikesCheck(like) {
+  if (parseInt(like.textContent) === 0) {
+    like.classList.add("card__like-button_counter-visible");
+  } else {
+    like.classList.remove("card__like-button_counter-visible");
   }
 }
