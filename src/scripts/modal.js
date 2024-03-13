@@ -21,7 +21,6 @@ function escClosePopup(evt) {
 
 function clickClosePopup(evt) {
   if (evt.target === evt.currentTarget) {
-    const openedModal = document.querySelector(".popup_is-opened");
-    closeModal(openedModal);
+    closeModal(evt.target);
   }
 }

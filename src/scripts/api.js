@@ -10,13 +10,9 @@ export const getProfile = () => {
     headers: {
       authorization: config.headers.token,
     },
-  })
-    .then((res) => {
-      return getResponseData(res);
-    })
-    .catch((err) => {
-      getResponseError(err);
-    });
+  }).then((res) => {
+    return getResponseData(res);
+  });
 };
 
 export const getCardList = () => {
@@ -24,13 +20,9 @@ export const getCardList = () => {
     headers: {
       authorization: config.headers.token,
     },
-  })
-    .then((res) => {
-      return getResponseData(res);
-    })
-    .catch((err) => {
-      getResponseError(err);
-    });
+  }).then((res) => {
+    return getResponseData(res);
+  });
 };
 
 export const updateProfile = (name, about) => {
@@ -44,13 +36,9 @@ export const updateProfile = (name, about) => {
       name: name,
       about: about,
     }),
-  })
-    .then((res) => {
-      return getResponseData(res);
-    })
-    .catch((err) => {
-      getResponseError(err);
-    });
+  }).then((res) => {
+    return getResponseData(res);
+  });
 };
 
 export const addNewCard = (name, link) => {
@@ -64,13 +52,9 @@ export const addNewCard = (name, link) => {
       name: name,
       link: link,
     }),
-  })
-    .then((res) => {
-      return getResponseData(res);
-    })
-    .catch((err) => {
-      getResponseError(err);
-    });
+  }).then((res) => {
+    return getResponseData(res);
+  });
 };
 
 export const removeCard = (data) => {
@@ -79,13 +63,9 @@ export const removeCard = (data) => {
     headers: {
       authorization: config.headers.token,
     },
-  })
-    .then((res) => {
-      return getResponseData(res);
-    })
-    .catch((err) => {
-      getResponseError(err);
-    });
+  }).then((res) => {
+    return getResponseData(res);
+  });
 };
 
 export const likeCardCountPlus = (data) => {
@@ -94,13 +74,9 @@ export const likeCardCountPlus = (data) => {
     headers: {
       authorization: config.headers.token,
     },
-  })
-    .then((res) => {
-      return getResponseData(res);
-    })
-    .catch((err) => {
-      getResponseError(err);
-    });
+  }).then((res) => {
+    return getResponseData(res);
+  });
 };
 
 export const likeCardCountMinus = (data) => {
@@ -109,13 +85,9 @@ export const likeCardCountMinus = (data) => {
     headers: {
       authorization: config.headers.token,
     },
-  })
-    .then((res) => {
-      return getResponseData(res);
-    })
-    .catch((err) => {
-      getResponseError(err);
-    });
+  }).then((res) => {
+    return getResponseData(res);
+  });
 };
 
 export const updateAvatar = (avatar) => {
@@ -128,13 +100,9 @@ export const updateAvatar = (avatar) => {
     body: JSON.stringify({
       avatar: avatar,
     }),
-  })
-    .then((res) => {
-      return getResponseData(res);
-    })
-    .catch((err) => {
-      getResponseError(err);
-    });
+  }).then((res) => {
+    return getResponseData(res);
+  });
 };
 
 function getResponseData(res) {
@@ -142,8 +110,4 @@ function getResponseData(res) {
     return res.json();
   }
   return Promise.reject(`Что-то пошло не так: ${res.status}`);
-}
-
-function getResponseError(err) {
-  console.log(`Ошибка. Запрос не выполнен: ${err}`);
 }

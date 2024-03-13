@@ -31,11 +31,27 @@ function createCard(
   amountOfLikesCheck(likeCounter);
 
   likeButton.addEventListener("click", () => {
-    likeCard(element, likeButton, likeCounter);
-    if (parseInt(likeCounter.textContent) > element.likes.length) {
-      likeCardCountPlus(element._id);
-    } else if (parseInt(likeCounter.textContent) <= element.likes.length) {
-      likeCardCountMinus(element._id);
+    const isLiked = likeButton.classList.contains(
+      "card__like-button_is-active"
+    );
+    if (!isLiked) {
+      likeCardCountPlus(element._id)
+        .then((res) => {
+          likeCard(res, likeButton, likeCounter);
+          amountOfLikesCheck(likeCounter);
+        })
+        .catch((err) => {
+          console.log(`Ошибка. Запрос не выполнен: ${err}`);
+        });
+    } else if (isLiked) {
+      likeCardCountMinus(element._id)
+        .then((res) => {
+          likeCard(res, likeButton, likeCounter);
+          amountOfLikesCheck(likeCounter);
+        })
+        .catch((err) => {
+          console.log(`Ошибка. Запрос не выполнен: ${err}`);
+        });
     }
   });
 
@@ -53,20 +69,18 @@ function deleteCard(deleteButton) {
   deleteButton.remove();
 }
 
-function likeCard(data, elem, like) {
-  if (!elem.classList.contains("card__like-button_is-active")) {
-    elem.classList.add("card__like-button_is-active");
-    if (parseInt(like.textContent) <= data.likes.length) {
-      like.textContent++;
-      amountOfLikesCheck(like);
-    }
-  } else {
-    elem.classList.remove("card__like-button_is-active");
-    if (parseInt(like.textContent) > 0) {
-      like.textContent--;
-      amountOfLikesCheck(like);
-    }
+function likeCard(elem, likeButton, likeCounter) {
+  const isLiked = likeButton.classList.contains("card__like-button_is-active");
+  const currentLikes = parseInt(likeCounter.textContent);
+  const serverLikes = elem.likes.length;
+
+  if (!isLiked && currentLikes < serverLikes) {
+    likeButton.classList.add("card__like-button_is-active");
+  } else if (isLiked && currentLikes > serverLikes) {
+    likeButton.classList.remove("card__like-button_is-active");
   }
+  likeCounter.textContent = serverLikes;
+  amountOfLikesCheck(likeCounter);
 }
 
 function checkLikeIsActive(userId, elem, button) {

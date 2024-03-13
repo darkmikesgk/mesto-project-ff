@@ -20,12 +20,6 @@ const avatarPopup = document.querySelector(".popup_type_avatar");
 const deleteCardPopup = document.querySelector(".popup_type_delete_card");
 const buttonOpenPopupProfile = document.querySelector(".profile__edit-button");
 const buttonAddPopupNewCard = document.querySelector(".profile__add-button");
-const buttonClosePopupProfile = editPopup.querySelector(".popup__close");
-const buttonClosePopupNewCard = newCardPopup.querySelector(".popup__close");
-const buttonClosePopupImage = imagePopup.querySelector(".popup__close");
-const buttonClosePopupAvatar = avatarPopup.querySelector(".popup__close");
-const buttonClosePopupDeleteCard =
-  deleteCardPopup.querySelector(".popup__close");
 const buttonSubmitChangesProfile = document.querySelector(
   ".popup__button_save-profile"
 );
@@ -40,6 +34,7 @@ const titleProfileValue = document.querySelector(".profile__title");
 const descriptionProfileValue = document.querySelector(".profile__description");
 const profileImage = document.querySelector(".profile__image");
 const popup = document.querySelectorAll(".popup");
+const closeButtons = document.querySelectorAll(".popup__close");
 let userId;
 //форма профиля
 const formElement = document.forms["edit-profile"];
@@ -63,30 +58,34 @@ const validationConfiguration = {
 };
 
 const getData = () => {
-  return Promise.all([getProfile(), getCardList()]).then((result) => {
-    titleProfileValue.textContent = result[0].name;
-    descriptionProfileValue.textContent = result[0].about;
-    nameInput.value = titleProfileValue.textContent;
-    jobInput.value = descriptionProfileValue.textContent;
-    profileImage.style.backgroundImage = `url(${result[0].avatar})`;
-    userId = result[0]._id;
+  return Promise.all([getProfile(), getCardList()])
+    .then((result) => {
+      titleProfileValue.textContent = result[0].name;
+      descriptionProfileValue.textContent = result[0].about;
+      nameInput.value = titleProfileValue.textContent;
+      jobInput.value = descriptionProfileValue.textContent;
+      profileImage.style.backgroundImage = `url(${result[0].avatar})`;
+      userId = result[0]._id;
 
-    result[1].forEach((card) => {
-      placesList.append(
-        createCard(
-          card,
-          userId,
-          likeCard,
-          deleteCard,
-          removeCard,
-          openConfirmPopup,
-          openCardImage,
-          likeCardCountPlus,
-          likeCardCountMinus
-        )
-      );
+      result[1].forEach((card) => {
+        placesList.append(
+          createCard(
+            card,
+            userId,
+            likeCard,
+            deleteCard,
+            removeCard,
+            openConfirmPopup,
+            openCardImage,
+            likeCardCountPlus,
+            likeCardCountMinus
+          )
+        );
+      });
+    })
+    .catch((err) => {
+      getResponseError(err);
     });
-  });
 };
 
 function submitHandleFormProfile(evt) {
@@ -98,14 +97,14 @@ function submitHandleFormProfile(evt) {
       descriptionProfileValue.textContent = result.about;
       nameInput.value = titleProfileValue.textContent;
       jobInput.value = descriptionProfileValue.textContent;
+      closeModal(editPopup);
     })
     .catch((err) => {
-      console.log(`Ошибка. Запрос не выполнен: ${err}`);
+      getResponseError(err);
     })
     .finally(() => {
       renderLoading(false, buttonSubmitChangesProfile);
     });
-  closeModal(editPopup);
 }
 
 function submitHandleAvatar(evt) {
@@ -115,14 +114,14 @@ function submitHandleAvatar(evt) {
     .then((res) => {
       avatarUrlInput.value = res.avatar;
       profileImage.style.backgroundImage = `url(${avatarUrlInput.value})`;
+      closeModal(avatarPopup);
     })
     .catch((err) => {
-      console.log(`Ошибка. Запрос не выполнен: ${err}`);
+      getResponseError(err);
     })
     .finally(() => {
       renderLoading(false, buttonSubmitChangesAvatar);
     });
-  closeModal(avatarPopup);
 }
 
 function submitHandleFormNewCard(evt) {
@@ -143,12 +142,15 @@ function submitHandleFormNewCard(evt) {
           likeCardCountMinus
         )
       );
+      closeModal(newCardPopup);
+      cardFormElement.reset();
+    })
+    .catch((err) => {
+      getResponseError(err);
     })
     .finally(() => {
       renderLoading(false, buttonSubmitAddCard);
     });
-  closeModal(newCardPopup);
-  cardFormElement.reset();
 }
 
 function openConfirmPopup(cardId, card) {
@@ -163,9 +165,14 @@ function openConfirmPopup(cardId, card) {
 
   deleteFormElement.handleSubmitConfirmPopup = (evt) => {
     evt.preventDefault();
-    removeCard(cardId);
-    deleteCard(card);
-    closeModal(deleteCardPopup);
+    removeCard(cardId)
+      .then(() => {
+        deleteCard(card);
+        closeModal(deleteCardPopup);
+      })
+      .catch((err) => {
+        getResponseError(err);
+      });
   };
   deleteFormElement.addEventListener(
     "submit",
@@ -195,55 +202,30 @@ function renderLoading(isLoading, buttonElement) {
   }
 }
 
+function getResponseError(err) {
+  console.log(`Ошибка. Запрос не выполнен: ${err}`);
+}
+
+closeButtons.forEach((button) => {
+  const popup = button.closest(".popup");
+  button.addEventListener("click", () => closeModal(popup));
+});
+
 buttonOpenPopupProfile.addEventListener("click", () => {
   openModal(editPopup);
-  enableValidation(editPopup, validationConfiguration);
-  clearValidation(editPopup, validationConfiguration);
-  if (
-    nameInput.value === titleProfileValue.textContent &&
-    jobInput.value === descriptionProfileValue.textContent
-  ) {
-    buttonSubmitChangesProfile.setAttribute("disabled", true);
-    buttonSubmitChangesProfile.classList.add("popup__button_disabled");
-  }
 });
 
 buttonAddPopupNewCard.addEventListener("click", () => {
   openModal(newCardPopup);
-  enableValidation(newCardPopup, validationConfiguration);
-  clearValidation(newCardPopup, validationConfiguration);
 });
 
 profileImage.addEventListener("click", () => {
   openModal(avatarPopup);
-  enableValidation(avatarPopup, validationConfiguration);
-  clearValidation(avatarPopup, validationConfiguration);
-});
-
-buttonClosePopupProfile.addEventListener("click", () => {
-  closeModal(editPopup);
-  formElement.reset();
-});
-
-buttonClosePopupNewCard.addEventListener("click", () => {
-  closeModal(newCardPopup);
-});
-
-buttonClosePopupImage.addEventListener("click", () => {
-  closeModal(imagePopup);
-});
-
-buttonClosePopupAvatar.addEventListener("click", () => {
-  closeModal(avatarPopup);
-});
-
-buttonClosePopupDeleteCard.addEventListener("click", () => {
-  closeModal(deleteCardPopup);
 });
 
 getData();
+enableValidation(validationConfiguration);
 smoothTransition();
 cardFormElement.addEventListener("submit", submitHandleFormNewCard);
 formElement.addEventListener("submit", submitHandleFormProfile);
 avatarFormElement.addEventListener("submit", submitHandleAvatar);
-
