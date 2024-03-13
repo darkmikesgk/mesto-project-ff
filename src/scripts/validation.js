@@ -15,12 +15,17 @@ const hideInputError = (formElement, inputElement) => {
 };
 
 function checkInputValidity(formElement, inputElement) {
+  if (inputElement.validity.patternMismatch) {
+    inputElement.setCustomValidity(inputElement.dataset.errorMessage);
+  } else {
+    inputElement.setCustomValidity("");
+  }
   if (!inputElement.validity.valid) {
     showInputError(formElement, inputElement, inputElement.validationMessage);
   } else {
-    hideInputError(formElement, inputElement);
+    hideInputError(formElement, inputElement); 
   }
-}
+};
 
 const hasInvalidInput = (inputList) => {
   return inputList.some((inputElement) => {
@@ -52,7 +57,7 @@ function clearValidation(formElement, validationConfiguration) {
       toggleButtonState(inputList, buttonElement);
     });
   });
-}
+};
 
 function enableValidation(validationConfiguration) {
   const formList = Array.from(
@@ -64,4 +69,4 @@ function enableValidation(validationConfiguration) {
     });
     clearValidation(formElement, validationConfiguration);
   });
-}
+};
