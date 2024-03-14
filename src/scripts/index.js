@@ -217,6 +217,7 @@ buttonOpenPopupProfile.addEventListener("click", () => {
 
 buttonAddPopupNewCard.addEventListener("click", () => {
   openModal(newCardPopup);
+  clearValidation(newCardPopup, validationConfiguration);
 });
 
 profileImage.addEventListener("click", () => {
